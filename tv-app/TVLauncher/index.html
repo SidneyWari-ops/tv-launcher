@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920, user-scalable=no">
+<title>TV Launcher</title>
+<style>
+/* Built for the 2015 Tizen TV engine: fixed 1920x1080, prefixed flexbox, no blur, no CSS variables, ES5 only. */
+*{margin:0;padding:0;-webkit-box-sizing:border-box;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#05060a;color:#f5f7fb;font-family:"SamsungOne","Samsung Sans","Tizen Sans",Helvetica,Arial,sans-serif}
+.row{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-align:center;-webkit-align-items:center;align-items:center}
+.ui{position:absolute;left:0;top:0;width:1920px;height:1080px;display:none}
+body.glass #glass,body.console #console,body.simple #simple{display:block}
+svg.glyph{width:44%;height:44%}
+svg.glyph path{fill:#fff}
+.toast{position:absolute;left:50%;bottom:80px;width:700px;margin-left:-350px;padding:20px 30px;border-radius:40px;background:rgba(0,0,0,.75);border:2px solid rgba(255,255,255,.3);text-align:center;font-size:28px;opacity:0;-webkit-transition:opacity .3s;z-index:9}
+.toast.on{opacity:1}
+.missing{opacity:.38}
+.keyhint{font-size:22px;color:rgba(255,255,255,.65)}
+.keyhint b{display:inline-block;padding:2px 12px;border-radius:8px;border:2px solid rgba(255,255,255,.4);color:#fff;margin:0 6px 0 14px;font-weight:600}
+.dotR,.dotG,.dotY{display:inline-block;width:20px;height:20px;border-radius:5px;margin:0 6px 0 16px;vertical-align:-3px}
+.dotR{background:#e0262f}.dotG{background:#1fa64a}.dotY{background:#f2b705}
+
+/* ---------- GLASS ---------- */
+#glass .bg{position:absolute;left:0;top:0;width:1920px;height:1080px;background:-webkit-linear-gradient(135deg,#3b1d6e,#6d2a7a 45%,#c2476e 80%,#f08a5d);background:linear-gradient(135deg,#3b1d6e,#6d2a7a 45%,#c2476e 80%,#f08a5d)}
+#glass .photo{position:absolute;left:0;top:0;width:1920px;height:1080px;opacity:0;-webkit-transition:opacity 2s}
+#glass .photo.on{opacity:1}
+#glass .shade{position:absolute;left:0;top:0;width:1920px;height:1080px;background:-webkit-linear-gradient(top,rgba(0,0,0,.35),rgba(0,0,0,.05) 30%,rgba(0,0,0,.05) 48%,rgba(0,0,0,.65));background:linear-gradient(to bottom,rgba(0,0,0,.35),rgba(0,0,0,.05) 30%,rgba(0,0,0,.05) 48%,rgba(0,0,0,.65))}
+#glass .clock{position:absolute;left:96px;top:60px;font-size:150px;font-weight:700;letter-spacing:-6px;line-height:1}
+#glass .date{position:absolute;left:100px;top:220px;font-size:34px;color:rgba(255,255,255,.75)}
+.gl{background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.38);border-radius:34px;box-shadow:inset 0 2px 0 rgba(255,255,255,.45),0 20px 50px rgba(0,0,0,.3)}
+#glass .wx{position:absolute;right:96px;top:64px;padding:22px 34px}
+#glass .wx .t{font-size:64px;font-weight:700;margin:0 24px}
+#glass .wx .m{font-size:24px;line-height:1.45;color:rgba(255,255,255,.8)}
+#glass .wx svg{width:76px;height:76px}
+#glass .hero{position:absolute;left:96px;top:560px;width:1100px}
+#glass .hero h1{font-size:150px;font-weight:800;letter-spacing:-6px;line-height:1}
+#glass .hero p{font-size:36px;color:rgba(255,255,255,.78);margin-top:14px}
+#glass .song{position:absolute;right:96px;top:640px;padding:20px 30px 20px 20px;width:560px}
+#glass .song .art{width:90px;height:90px;border-radius:24px;margin-right:24px;font-size:40px;font-weight:800;text-align:center;line-height:90px;background:#3fd17a}
+.lbl{font-size:18px;letter-spacing:4px;color:rgba(255,255,255,.65);font-weight:700}
+#glass .song .tt{font-size:30px;font-weight:700}
+#glass .song .aa{font-size:24px;color:rgba(255,255,255,.7)}
+#glass .tiles{position:absolute;left:84px;top:868px;width:1760px}
+.gtile{position:relative;width:172px;height:110px;margin:0 11px;border-radius:28px;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.45);box-shadow:inset 0 2px 0 rgba(255,255,255,.6),0 14px 30px rgba(0,0,0,.3);-webkit-transition:-webkit-transform .2s,background .2s;overflow:hidden}
+.gtile:before{content:"";position:absolute;left:0;top:0;right:0;height:48%;background:-webkit-linear-gradient(top,rgba(255,255,255,.4),rgba(255,255,255,.05));background:linear-gradient(to bottom,rgba(255,255,255,.4),rgba(255,255,255,.05))}
+.gtile .tint{position:absolute;left:0;right:0;bottom:0;height:100%;opacity:.28}
+.gtile svg{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px}
+.gtile.focus{-webkit-transform:scale(1.14) translateY(-8px);transform:scale(1.14) translateY(-8px);background:rgba(255,255,255,.34);border-color:#fff;box-shadow:0 0 0 4px #fff,0 26px 50px rgba(0,0,0,.45)}
+.gtile.focus .tint{opacity:.5}
+#glass .tname{position:absolute;left:84px;top:1010px;width:1760px;font-size:26px;font-weight:600}
+#glass .keys{position:absolute;left:100px;top:790px}
+
+/* ---------- CONSOLE ---------- */
+#console{background:-webkit-radial-gradient(70% 35%,circle,#16307a 0%,#081343 45%,#02041a 100%);background:radial-gradient(circle at 70% 35%,#16307a 0%,#081343 45%,#02041a 100%);font-family:"Trebuchet MS","SamsungOne",Arial,sans-serif}
+#console .scan{position:absolute;left:0;top:0;width:1920px;height:1080px;background:-webkit-repeating-linear-gradient(top,rgba(255,255,255,.035) 0,rgba(255,255,255,.035) 1px,transparent 1px,transparent 3px);background:repeating-linear-gradient(to bottom,rgba(255,255,255,.035) 0,rgba(255,255,255,.035) 1px,transparent 1px,transparent 3px)}
+#console .floor{position:absolute;left:0;top:780px;width:1920px;height:300px;background:-webkit-linear-gradient(top,rgba(120,170,255,.18),rgba(120,170,255,0) 30%);background:linear-gradient(to bottom,rgba(120,170,255,.18),rgba(120,170,255,0) 30%)}
+.fr{position:absolute;border:2px solid rgba(150,200,255,.4);background:-webkit-linear-gradient(top,rgba(30,60,140,.35),rgba(6,12,40,.6));background:linear-gradient(to bottom,rgba(30,60,140,.35),rgba(6,12,40,.6));box-shadow:inset 0 2px 0 rgba(255,255,255,.18)}
+.fr:before,.fr:after{content:"";position:absolute;width:20px;height:20px;border:0 solid #bfe0ff}
+.fr:before{left:-2px;top:-2px;border-width:3px 0 0 3px}
+.fr:after{right:-2px;bottom:-2px;border-width:0 3px 3px 0}
+.mono{font-family:"Courier New",monospace}
+#console .brand{position:absolute;left:96px;top:72px;font-size:34px;letter-spacing:12px;color:#bfe0ff;text-shadow:0 0 14px rgba(120,180,255,.9)}
+#console .brand i{display:inline-block;width:18px;height:18px;border-radius:50%;background:#9fd2ff;box-shadow:0 0 16px #6fb8ff;margin-right:20px;vertical-align:2px;-webkit-animation:pulse 2.4s infinite}
+@-webkit-keyframes pulse{50%{opacity:.3}}
+#console .hud{top:52px;height:92px;width:220px;padding:14px 24px;font-size:36px;color:#eef6ff}
+#console .hud .lbl{color:#7fb4ff;font-size:16px;letter-spacing:5px}
+#console .menu{left:96px;top:190px;width:560px;height:700px;padding:22px}
+#console .menu .lbl{color:#7fb4ff;padding:0 8px 14px;border-bottom:1px solid rgba(150,200,255,.25);margin-bottom:10px}
+.citem{height:62px;padding:0 16px;font-size:30px;color:#a9c3ea;border:2px solid transparent}
+.citem .ic{width:44px;height:44px;border-radius:9px;margin-right:20px;position:relative}
+.citem .ic svg{position:absolute;left:10px;top:10px;width:24px;height:24px}
+.citem .ar{margin-left:auto;opacity:0;font-size:26px}
+.citem.focus{color:#fff;border-color:rgba(170,215,255,.65);background:-webkit-linear-gradient(left,rgba(90,160,255,.4),rgba(90,160,255,.05));background:linear-gradient(to right,rgba(90,160,255,.4),rgba(90,160,255,.05));text-shadow:0 0 12px rgba(140,200,255,.9)}
+.citem.focus .ar{opacity:1}
+#console .emb{position:absolute;left:1120px;top:300px;width:300px;height:300px;border-radius:66px;box-shadow:0 0 0 2px rgba(255,255,255,.35),0 0 80px rgba(95,182,255,.6),inset 0 3px 0 rgba(255,255,255,.5);-webkit-animation:bob 4s ease-in-out infinite;-webkit-box-reflect:below 24px -webkit-linear-gradient(transparent 60%,rgba(255,255,255,.22))}
+#console .emb svg{position:absolute;left:80px;top:80px;width:140px;height:140px}
+@-webkit-keyframes bob{50%{-webkit-transform:translateY(-14px)}}
+#console .ring{position:absolute;left:970px;top:150px;width:600px;height:600px;border-radius:50%;border:2px solid rgba(160,210,255,.25);-webkit-animation:spin 40s linear infinite}
+@-webkit-keyframes spin{to{-webkit-transform:rotate(360deg)}}
+#console .info{left:730px;top:690px;width:1094px;height:200px;padding:28px 36px}
+#console .info h1{font-size:84px;font-weight:800;color:#e6f2ff;text-shadow:0 0 22px rgba(95,182,255,.6);margin-top:4px}
+#console .info p{font-size:28px;color:#bcd2f2}
+#console .song{left:96px;top:930px;width:700px;height:110px;padding:16px 22px}
+#console .song .disc{width:72px;height:72px;border-radius:50%;margin-right:22px;background:-webkit-linear-gradient(45deg,#b9d7ff,#5a7fd9,#e3c6ff,#79e2ff);position:relative;-webkit-animation:spin 6s linear infinite}
+#console .song .disc:after{content:"";position:absolute;left:27px;top:27px;width:18px;height:18px;border-radius:50%;background:#0a1440;border:1px solid rgba(255,255,255,.5)}
+#console .song .tt{font-size:28px;font-weight:700}
+#console .song .aa{font-size:22px;color:#a9c0e6}
+#console .keys{position:absolute;right:96px;top:972px}
+
+/* ---------- SIMPLE ---------- */
+#simple{background:#08090d}
+#simple .shelf{position:absolute;left:96px;top:56px;width:1728px;height:620px;border-radius:48px;overflow:hidden;box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 30px 60px rgba(0,0,0,.5);-webkit-transition:background .5s}
+#simple .shelf .gloss{position:absolute;left:0;top:0;right:0;bottom:0;background:-webkit-linear-gradient(-10deg,rgba(255,255,255,0) 60%,rgba(255,255,255,.18));background:linear-gradient(170deg,rgba(255,255,255,.18),rgba(255,255,255,0) 40%)}
+#simple .big{position:absolute;right:120px;top:130px;width:360px;height:360px}
+#simple .big svg{width:100%;height:100%}
+#simple .pills{position:absolute;right:56px;top:44px}
+.pill{padding:10px 24px;border-radius:40px;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.3);font-size:26px;font-weight:600;margin-left:14px}
+.pill svg{width:32px;height:32px;vertical-align:-7px;margin-right:8px}
+#simple .copy{position:absolute;left:70px;bottom:70px;width:1000px}
+#simple .copy h1{font-size:140px;font-weight:800;letter-spacing:-6px;line-height:1}
+#simple .copy p{font-size:36px;color:rgba(255,255,255,.8);margin-top:10px}
+#simple .copy .sg{font-size:26px;color:rgba(255,255,255,.8);margin-top:22px}
+#simple .icons{position:absolute;left:0;top:730px;width:1920px;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center}
+.sicon{width:230px;margin:0 36px;text-align:center}
+.sicon .sq{position:relative;width:230px;height:230px;border-radius:56px;overflow:hidden;box-shadow:inset 0 2px 0 rgba(255,255,255,.6),0 16px 34px rgba(0,0,0,.45);-webkit-transition:-webkit-transform .2s}
+.sicon .sq:before{content:"";position:absolute;left:0;top:0;right:0;height:46%;background:-webkit-linear-gradient(top,rgba(255,255,255,.45),rgba(255,255,255,.06));background:linear-gradient(to bottom,rgba(255,255,255,.45),rgba(255,255,255,.06))}
+.sicon .sq svg{position:absolute;left:69px;top:69px;width:92px;height:92px}
+.sicon .nm{font-size:30px;font-weight:600;margin-top:22px;opacity:.55}
+.sicon.focus .sq{-webkit-transform:scale(1.12);transform:scale(1.12);box-shadow:0 0 0 6px #fff,0 34px 60px rgba(0,0,0,.55)}
+.sicon.focus .nm{opacity:1}
+#simple .keys{position:absolute;left:0;width:1920px;top:1030px;text-align:center}
+</style>
+</head>
+<body class="glass">
+
+<div class="ui" id="glass">
+  <div class="bg"></div>
+  <img class="photo" id="ph0" alt=""><img class="photo" id="ph1" alt="">
+  <div class="shade"></div>
+  <div class="clock" data-clock>9:41</div>
+  <div class="date" data-date>Sunday, November 1</div>
+  <div class="wx gl row"><span data-wxicon></span><span class="t" data-wxtemp>--°</span><span class="m"><b data-wxplace>Lubbock</b><br><span data-wxdesc>Loading weather</span><br><span data-wxrange></span></span></div>
+  <div class="hero"><h1 data-name>YouTube</h1><p data-blurb>Videos, Shorts and live streams</p></div>
+  <div class="keys keyhint"><b>◀ ▶</b>move<b>OK</b>open<span class="dotR"></span><span class="dotG"></span><span class="dotY"></span>switch look</div>
+  <div class="song gl row"><div class="art" data-songart>♪</div><div><div class="lbl">SONG PICK</div><div class="tt" data-songt>Song</div><div class="aa" data-songa>Artist</div></div></div>
+  <div class="tiles row" id="gtiles"></div>
+</div>
+
+<div class="ui" id="console">
+  <div class="floor"></div>
+  <div class="brand mono"><i></i>MAIN MENU</div>
+  <div class="fr hud mono" style="left:1124px"><div class="lbl">TIME</div><span data-clock>9:41</span></div>
+  <div class="fr hud mono" style="left:1364px"><div class="lbl">DATE</div><span data-dshort>11/01</span></div>
+  <div class="fr hud mono" style="left:1604px"><div class="lbl">WEATHER</div><span data-wxtemp>--°</span></div>
+  <div class="fr menu"><div class="lbl mono">SELECT APPLICATION</div><div id="citems"></div></div>
+  <div class="ring"></div>
+  <div class="emb" id="emb"></div>
+  <div class="fr info"><div class="lbl mono" style="color:#7fb4ff">SELECTED</div><h1 data-name>YouTube</h1><p data-blurb>Videos, Shorts and live streams</p></div>
+  <div class="fr song row"><div class="disc"></div><div><div class="lbl mono" style="color:#7fb4ff">SONG PICK</div><div class="tt" data-songt>Song</div><div class="aa" data-songa>Artist</div></div></div>
+  <div class="keys keyhint mono"><b>▲ ▼</b>select<b>OK</b>open<span class="dotR"></span><span class="dotG"></span><span class="dotY"></span>theme</div>
+  <div class="scan"></div>
+</div>
+
+<div class="ui" id="simple">
+  <div class="shelf" id="shelf">
+    <div class="gloss"></div>
+    <div class="big" id="big"></div>
+    <div class="pills row"><span class="pill"><span data-wxicon></span><span data-wxtemp>--°</span></span><span class="pill" data-clock>9:41</span></div>
+    <div class="copy"><h1 data-name>YouTube</h1><p data-blurb>Videos, Shorts and live streams</p><div class="sg">Song pick: <b data-songt>Song</b> · <span data-songa>Artist</span></div></div>
+  </div>
+  <div class="icons row" id="sicons"></div>
+  <div class="keys keyhint"><b>◀ ▶</b>move<b>OK</b>open<span class="dotR"></span><span class="dotG"></span><span class="dotY"></span>switch look</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== EDIT APPS HERE: name, words to find the installed TV app, color, icon, description ===== */
+var APPS = [
+  {id:"youtube", name:"YouTube",     find:["youtube"],                 c:"#ff1f3d", g:"play",   blurb:"Videos, Shorts and live streams"},
+  {id:"netflix", name:"Netflix",     find:["netflix"],                 c:"#d81f26", g:"film",   blurb:"Series and movies"},
+  {id:"spotify", name:"Spotify",     find:["spotify"],                 c:"#1db954", g:"waves",  blurb:"Your playlists, podcasts and mixes"},
+  {id:"apple",   name:"Apple Music", find:["apple music","apple tv"],  c:"#f5364f", g:"note",   blurb:"Albums, radio and lyrics"},
+  {id:"prime",   name:"Prime Video", find:["prime video","amazon"],    c:"#0f9fd8", g:"play",   blurb:"Prime originals and rentals"},
+  {id:"hulu",    name:"Hulu",        find:["hulu"],                    c:"#17b978", g:"film",   blurb:"Next-day TV and originals"},
+  {id:"twitch",  name:"Twitch",      find:["twitch"],                  c:"#8a4dff", g:"chat",   blurb:"Live streams and chat"},
+  {id:"sports",  name:"Sports",      find:["espn","sports"],           c:"#e8501c", g:"ball",   blurb:"Live games, scores and highlights"},
+  {id:"web",     name:"Internet",    find:["web browser","internet"],  c:"#3a3f55", g:"globe",  blurb:"The TV's web browser"}
+];
+var SIMPLE = ["youtube","spotify","apple","sports"];
+var PLACE = {name:"Lubbock", lat:33.5779, lon:-101.8552};
+var SHUFFLE_SECONDS = 600;
+var SONGS = [["luther","Kendrick Lamar & SZA"],["Die With A Smile","Lady Gaga & Bruno Mars"],["APT.","ROSÉ & Bruno Mars"],["Timeless","The Weeknd & Playboi Carti"],["BIRDS OF A FEATHER","Billie Eilish"],["Espresso","Sabrina Carpenter"],["Sticky","Tyler, The Creator"],["BAND4BAND","Central Cee & Lil Baby"],["Abracadabra","Lady Gaga"],["Not Like Us","Kendrick Lamar"],["30 For 30","SZA & Kendrick Lamar"],["Ordinary","Alex Warren"]];
+
+var GLYPHS = {
+  play:'<path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/>',
+  film:'<path d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm1 2v2h2V6H5zm12 0v2h2V6h-2zM5 10v4h2v-4H5zm12 0v4h2v-4h-2zM5 16v2h2v-2H5zm12 0v2h2v-2h-2zM9 6v12h6V6H9z"/>',
+  waves:'<path d="M3 10h2.5v4H3zM7.25 6h2.5v12h-2.5zM11.5 3h2.5v18h-2.5zM15.75 7h2.5v10h-2.5zM20 10h2v4h-2z"/>',
+  note:'<path d="M19 3v12.5a3.5 3.5 0 1 1-2-3.16V7.3l-8 1.6v8.6a3.5 3.5 0 1 1-2-3.16V5.5L19 3z"/>',
+  chat:'<path d="M12 9.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM7.05 7.05l1.41 1.41a5 5 0 0 0 0 7.08l-1.41 1.41a7 7 0 0 1 0-9.9zm9.9 0a7 7 0 0 1 0 9.9l-1.41-1.41a5 5 0 0 0 0-7.08zM4.22 4.22l1.42 1.42a9 9 0 0 0 0 12.72l-1.42 1.42a11 11 0 0 1 0-15.56zm15.56 0a11 11 0 0 1 0 15.56l-1.42-1.42a9 9 0 0 0 0-12.72z"/>',
+  star:'<path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/>',
+  ball:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 2c.9 0 1.77.15 2.58.42L12 6.3 9.42 4.42A8 8 0 0 1 12 4zM6.9 5.8l3.2 2.3-1.2 3.7H5a8 8 0 0 1 1.9-6zM4.3 13.8h4.6l1.3 3.9-2.4 2.1a8 8 0 0 1-3.5-6zm7.7 6.2c-.7 0-1.4-.1-2-.27l2-1.75 2 1.75c-.6.17-1.3.27-2 .27zm4.2-.2l-2.4-2.1 1.3-3.9h4.6a8 8 0 0 1-3.5 6zM15.1 11.8l-1.2-3.7 3.2-2.3a8 8 0 0 1 1.9 6h-3.9zm-3.1-3.2l2 1.5-.8 2.5h-2.4l-.8-2.5 2-1.5z"/>',
+  globe:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.9 9h-3a15 15 0 0 0-1.3-5.6A8 8 0 0 1 18.9 11zM12 4.1c.9 1.2 1.7 3.6 1.9 6.9h-3.8c.2-3.3 1-5.7 1.9-6.9zM4.1 13h3a15 15 0 0 0 1.3 5.6A8 8 0 0 1 4.1 13zm3-2h-3a8 8 0 0 1 4.3-5.6A15 15 0 0 0 7.1 11zM12 19.9c-.9-1.2-1.7-3.6-1.9-6.9h3.8c-.2 3.3-1 5.7-1.9 6.9zm2.6-1.3a15 15 0 0 0 1.3-5.6h3a8 8 0 0 1-4.3 5.6z"/>'
+};
+function svg(g){ return '<svg class="glyph" viewBox="0 0 24 24">'+(GLYPHS[g]||GLYPHS.globe)+'</svg>'; }
+function $(id){ return document.getElementById(id); }
+function each(sel,fn){ var n=document.querySelectorAll(sel); for(var i=0;i<n.length;i++) fn(n[i]); }
+function byId(id){ for(var i=0;i<APPS.length;i++) if(APPS[i].id===id) return APPS[i]; return null; }
+function shade(hex,amt){ var n=parseInt(hex.slice(1),16),r=(n>>16)&255,g=(n>>8)&255,b=n&255; function f(v){ return Math.max(0,Math.min(255,Math.round(amt<0?v*(1+amt):v+(255-v)*amt))); } return "rgb("+f(r)+","+f(g)+","+f(b)+")"; }
+function grad(c){ return "-webkit-linear-gradient(-30deg,"+shade(c,.12)+","+shade(c,-.3)+")"; }
+
+/* ===== find installed TV apps ===== */
+var installed = {};
+function scanApps(done){
+  try{
+    tizen.application.getAppsInfo(function(list){
+      for(var i=0;i<APPS.length;i++){
+        for(var j=0;j<list.length;j++){
+          var nm=(list[j].name||"").toLowerCase(), hit=false;
+          for(var k=0;k<APPS[i].find.length;k++) if(nm.indexOf(APPS[i].find[k])>=0) hit=true;
+          if(hit && list[j].show!==false){ installed[APPS[i].id]=list[j].id; break; }
+        }
+      }
+      done(true);
+    }, function(){ done(false); });
+  }catch(e){ done(false); }
+}
+var haveTizen = (typeof tizen!=="undefined");
+
+/* ===== build ===== */
+var lists = {glass:[],console:[],simple:[]};
+function build(){
+  var h="", i, a;
+  for(i=0;i<APPS.length;i++){ a=APPS[i];
+    h+='<div class="gtile'+(haveTizen&&!installed[a.id]?' missing':'')+'" data-app="'+a.id+'"><div class="tint" style="background:'+a.c+'"></div>'+svg(a.g)+'</div>'; }
+  $("gtiles").innerHTML=h; h="";
+  for(i=0;i<APPS.length;i++){ a=APPS[i];
+    h+='<div class="citem row'+(haveTizen&&!installed[a.id]?' missing':'')+'" data-app="'+a.id+'"><div class="ic" style="background:'+grad(a.c)+'">'+svg(a.g)+'</div>'+a.name+'<span class="ar">▸</span></div>'; }
+  $("citems").innerHTML=h; h="";
+  for(i=0;i<SIMPLE.length;i++){ a=byId(SIMPLE[i]); if(!a) continue;
+    h+='<div class="sicon'+(haveTizen&&!installed[a.id]?' missing':'')+'" data-app="'+a.id+'"><div class="sq" style="background:'+grad(a.c)+'">'+svg(a.g)+'</div><div class="nm">'+a.name+'</div></div>'; }
+  $("sicons").innerHTML=h;
+  lists.glass=document.querySelectorAll("#gtiles [data-app]");
+  lists.console=document.querySelectorAll("#citems [data-app]");
+  lists.simple=document.querySelectorAll("#sicons [data-app]");
+}
+
+/* ===== state / focus ===== */
+var theme="glass", idx={glass:0,console:0,simple:0};
+try{ theme=localStorage.getItem("tvui")||"glass"; }catch(e){}
+function current(){ var l=lists[theme]; return byId(l[idx[theme]].getAttribute("data-app")); }
+function render(){
+  document.body.className=theme;
+  var l=lists[theme];
+  for(var i=0;i<l.length;i++) l[i].className=l[i].className.replace(" focus","")+(i===idx[theme]?" focus":"");
+  var a=current();
+  each("[data-name]",function(n){ n.innerHTML=a.name; });
+  each("[data-blurb]",function(n){ n.innerHTML=a.blurb+(haveTizen&&!installed[a.id]?" · not installed on this TV":""); });
+  $("emb").style.background=grad(a.c); $("emb").innerHTML=svg(a.g);
+  $("big").innerHTML=svg(a.g);
+  $("shelf").style.background="-webkit-linear-gradient(-45deg,"+shade(a.c,-.15)+","+shade(a.c,-.75)+")";
+}
+function setTheme(t){ theme=t; try{ localStorage.setItem("tvui",t); }catch(e){} render(); }
+function toast(msg){ var t=$("toast"); t.innerHTML=msg; t.className="toast on"; clearTimeout(toast.h); toast.h=setTimeout(function(){ t.className="toast"; },2600); }
+function openApp(){
+  var a=current();
+  if(!haveTizen){ toast("Opens "+a.name+" on the TV"); return; }
+  if(!installed[a.id]){ toast(a.name+" isn't installed on this TV"); return; }
+  try{ tizen.application.launch(installed[a.id], function(){}, function(e){ toast("Couldn't open "+a.name); }); }catch(e){ toast("Couldn't open "+a.name); }
+}
+
+/* ===== remote ===== */
+var KEYS=["ColorF0Red","ColorF1Green","ColorF2Yellow","1","2","3"];
+try{ for(var k=0;k<KEYS.length;k++) tizen.tvinputdevice.registerKey(KEYS[k]); }catch(e){}
+document.addEventListener("keydown",function(e){
+  var c=e.keyCode, n=lists[theme].length, vertical=(theme==="console");
+  if(c===37||c===38){ if((c===38)===vertical||c===37&&!vertical){ idx[theme]=(idx[theme]-1+n)%n; render(); } }
+  else if(c===39||c===40){ if((c===40)===vertical||c===39&&!vertical){ idx[theme]=(idx[theme]+1)%n; render(); } }
+  else if(c===13){ openApp(); }
+  else if(c===403||c===49){ setTheme("glass"); }
+  else if(c===404||c===50){ setTheme("console"); }
+  else if(c===405||c===51){ setTheme("simple"); }
+  else if(c===10009){ try{ tizen.application.getCurrentApplication().exit(); }catch(err){} }
+  else return;
+  e.preventDefault();
+});
+
+/* ===== clock ===== */
+var DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function pad(n){ return (n<10?"0":"")+n; }
+function tick(){
+  var d=new Date(), h=d.getHours()%12||12, t=h+":"+pad(d.getMinutes());
+  each("[data-clock]",function(n){ n.innerHTML=t; });
+  each("[data-date]",function(n){ n.innerHTML=DAYS[d.getDay()]+", "+MONTHS[d.getMonth()]+" "+d.getDate(); });
+  each("[data-dshort]",function(n){ n.innerHTML=pad(d.getMonth()+1)+"/"+pad(d.getDate()); });
+}
+
+/* ===== songs ===== */
+var si=Math.floor(new Date().getTime()/86400000)%SONGS.length;
+function song(){
+  var s=SONGS[si];
+  each("[data-songt]",function(n){ n.innerHTML=s[0]; });
+  each("[data-songa]",function(n){ n.innerHTML=s[1]; });
+  var art=document.querySelector("[data-songart]"); art.innerHTML=s[0].charAt(0).toUpperCase();
+  art.style.background="hsl("+((si*47)%360)+",80%,55%)";
+  si=(si+1)%SONGS.length;
+}
+
+/* ===== weather ===== */
+var WX={0:"Clear",1:"Mostly clear",2:"Partly cloudy",3:"Cloudy",45:"Fog",48:"Fog",51:"Drizzle",53:"Drizzle",55:"Drizzle",61:"Light rain",63:"Rain",65:"Heavy rain",71:"Light snow",73:"Snow",75:"Heavy snow",80:"Showers",81:"Showers",82:"Heavy showers",95:"Thunderstorms",96:"Thunderstorms",99:"Thunderstorms"};
+var SUN='<svg viewBox="0 0 24 24" style="width:100%;height:100%"><circle cx="9" cy="9" r="4" fill="#ffd34d"/><path d="M8 20a4 4 0 0 1 0-8 5 5 0 0 1 9.6 1.5A3.3 3.3 0 0 1 17.5 20z" fill="#eef3ff"/></svg>';
+function weather(){
+  each("[data-wxicon]",function(n){ n.innerHTML=SUN; n.style.display="inline-block"; n.style.width="40px"; n.style.height="40px"; });
+  var x=new XMLHttpRequest();
+  x.open("GET","https://api.open-meteo.com/v1/forecast?latitude="+PLACE.lat+"&longitude="+PLACE.lon+"&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&timezone=auto&forecast_days=1");
+  x.onreadystatechange=function(){
+    if(x.readyState!==4) return;
+    if(x.status===200){ try{
+      var j=JSON.parse(x.responseText), t=Math.round(j.current.temperature_2m)+"°";
+      each("[data-wxtemp]",function(n){ n.innerHTML=t; });
+      each("[data-wxdesc]",function(n){ n.innerHTML=WX[j.current.weather_code]||""; });
+      each("[data-wxrange]",function(n){ n.innerHTML="H "+Math.round(j.daily.temperature_2m_max[0])+"°  L "+Math.round(j.daily.temperature_2m_min[0])+"°"; });
+    }catch(e){} }
+    else each("[data-wxdesc]",function(n){ n.innerHTML="Weather unavailable"; });
+  };
+  try{ x.send(); }catch(e){}
+}
+
+/* ===== glass photo shuffle ===== */
+var pl=0;
+function photo(){
+  var next=$(pl?"ph0":"ph1"), cur=$(pl?"ph1":"ph0"), img=new Image();
+  img.onload=function(){ next.src=img.src; next.className="photo on"; cur.className="photo"; pl=pl?0:1; };
+  img.src="https://picsum.photos/seed/tv"+new Date().getTime()+"/1920/1080";
+}
+
+/* ===== start ===== */
+function start(){
+  build(); render(); tick(); song(); weather(); photo();
+  setInterval(tick,10000); setInterval(song,20000); setInterval(weather,900000); setInterval(photo,SHUFFLE_SECONDS*1000);
+}
+if(haveTizen) scanApps(function(){ start(); }); else start();
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Build output from the Tizen SDK
+*.wgt
+tv-app/TVLauncher/author-signature.xml
+tv-app/TVLauncher/signature1.xml
+tv-app/TVLauncher/.manifest.tmp
+
+# Logs written by the install scripts
+*-log.txt
+step4.txt
+
+# Downloaded installers
+*.exe
+*.part
+
+# OS clutter
+Thumbs.db
+desktop.ini
+.DS_Store
